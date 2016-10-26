@@ -1,7 +1,7 @@
 package com.tibco;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.Ignition;
@@ -21,7 +21,12 @@ public class App {
       spi.setLocalPort(48500);
       TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
 
-      ipFinder.setAddresses(Arrays.asList(args));
+
+      ArrayList<String> addresses = new ArrayList<>();
+      for (int i = 0; i < args.length; ++i) {
+        addresses.add(args[i]);
+      }
+      ipFinder.setAddresses(addresses);
 
       spi.setIpFinder(ipFinder);
 
@@ -35,7 +40,9 @@ public class App {
       Ignite ignite = Ignition.start(clusterConfig);
       IgniteCache<String, String> cache = ignite.getOrCreateCache(CACHE_NAME);
 
-      cache.put("Hello", "World");
+      if (args[0].equals("write")) {
+        cache.put("Hello", "World");
+      }
 
       IgniteCache<String, String> c = ignite.getOrCreateCache(CACHE_NAME);
       System.out.println(c.get("Hello"));
